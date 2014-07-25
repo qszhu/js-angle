@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=0;"/>
+    <script src="http://code.createjs.com/easeljs-0.7.0.min.js"></script>
+    <script src="game.js"></script>
+    <script>
+        function init() {
+            stage = new createjs.Stage("canvas");
+            board = new Board();
+            size = 30;
+            drawBoard(stage, board);
+        }
+
+        function drawBoard() {
+            stage.removeAllChildren();
+            for (var i = 0; i < board.Cells.length; i++) {
+                for (var j = 0; j < board.Cells[i].length; j++) {
+                    var cell = board.Cells[i][j];
+                    var color = "grey";
+                    if (cell === board.BLOCK) color = "black";
+                    if (cell === board.TARGET) color = "blue";
+                    var circle = new createjs.Shape();
+                    circle.graphics.beginFill(color).drawCircle(0,0,size/2);
+                    circle.x = j*size+size/2;
+                    if (i % 2 !== 0) circle.x += size/2;
+                    circle.y = i*size+size/2;
+                    circle.on("click", block);
+                    stage.addChild(circle);
+                }
+            }
+            stage.update();
+        }
+
+        function block(event) {
+            var node = event.target;
+            var row = (node.y-size/2)/size;
+            var col = row % 2 === 0 ? (node.x-size/2)/size : (node.x-size)/size;
+            board.block(row, col);
+            if (board.win() || board.lose()) board.newGame();
+            drawBoard();
+        }
+    </script>
+</head>
+<body onLoad="init();">
+    <canvas id="canvas" width="285" height="270">
+        No canvas support
+    </canvas>
+</body>
+</html>
